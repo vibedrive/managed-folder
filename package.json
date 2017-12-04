@@ -1,0 +1,30 @@
+{
+  "name": "music-folder",
+  "version": "0.1.0",
+  "description": "manage a music folder",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "standard --fix && node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vibedrive/music-folder-daemon.git"
+  },
+  "author": "kareniel",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/vibedrive/music-folder-daemon/issues"
+  },
+  "homepage": "https://github.com/vibedrive/music-folder-daemon#readme",
+  "dependencies": {
+    "discovery-swarm": "^4.4.2",
+    "mkdirp": "^0.5.1",
+    "nanobus": "^4.3.1",
+    "run-parallel": "^1.1.6"
+  },
+  "devDependencies": {
+    "standard": "^10.0.3",
+    "tape": "^4.8.0"
+  }
+}
