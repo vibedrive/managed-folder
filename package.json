@@ -1,7 +1,7 @@
 {
-  "name": "music-folder",
-  "version": "0.1.0",
-  "description": "manage a music folder",
+  "name": "managed-folder",
+  "version": "0.2.0",
+  "description": "emit events with namespaces when files inside a manage folder change",
   "main": "index.js",
   "scripts": {
     "start": "node .",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vibedrive/music-folder-daemon.git"
+    "url": "git+https://github.com/vibedrive/managed-folder.git"
   },
   "author": "kareniel",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/vibedrive/music-folder-daemon/issues"
+    "url": "https://github.com/vibedrive/managed-folder/issues"
   },
-  "homepage": "https://github.com/vibedrive/music-folder-daemon#readme",
+  "homepage": "https://github.com/vibedrive/managed-folder#readme",
   "dependencies": {
     "discovery-swarm": "^4.4.2",
     "mkdirp": "^0.5.1",
