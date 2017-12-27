@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/vibedrive/managed-folder#readme",
   "dependencies": {
-    "discovery-swarm": "^4.4.2",
     "mkdirp": "^0.5.1",
     "nanobus": "^4.3.1"
   },

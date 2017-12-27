@@ -16,12 +16,13 @@ can be passed a map of namespace to folder name as an option.
 ### usage
 
 ```js
+var Folder = require('managed-folder')
 var opts = {
   appdir: '/Users/kareniel/Vibedrive',
   subfolders: { inbox: 'Inbox' }
 }
 
-var folder = musicfolder(opts)
+var folder = Folder(opts)
 
 folder.on('inbox:add', function (filepath) {
   console.log('file added to inbox folder:', filepath)
