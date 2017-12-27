@@ -1,10 +1,76 @@
-var test = require('tape')
+const inbox = 'Inbox'
+const ms = 250
+
+var crypto = require('crypto')
+var fs = require('fs')
 var path = require('path')
+var test = require('tape')
+var mkdirp = require('mkdirp')
 var Folder = require('./index.js')
+var folderName = 'test-' + crypto.randomBytes(16).toString('hex')
+var appdir = path.join(require('os').homedir(), folderName)
+var testdir = path.join(appdir, inbox)
+var testfile = path.join(testdir, 'test.txt')
+var EventEmitter = require('events')
 
-test('it runs', function (t) {
-  var folder = Folder({ appdir: path.join(require('os').homedir(), 'test') })
+var folder
 
-  folder.close()
+test('setup', function (t) {
+  mkdirp.sync(appdir)
+
+  folder = Folder({
+    appdir,
+    subfolders: { inbox }
+  })
+
+  var stat = fs.statSync(testdir)
+
+  t.ok(stat && stat.isDirectory(), 'subfolder has been created')
+  t.ok(!Object.entries(folder.watchers).every(w => w instanceof EventEmitter), 'watchers created')
+
   t.end()
 })
+
+test('should emit events', async function (t) {
+  t.plan(3)
+
+  folder.on('inbox:add', function (filepath) {
+    t.ok(filepath === testfile, 'add event emitted')
+  })
+
+  folder.on('inbox:change', function (filepath) {
+    t.ok(filepath === testfile, 'change event emitted')
+  })
+
+  folder.on('inbox:remove', function (filepath) {
+    t.ok(filepath === testfile, 'remove event emitted')
+  })
+
+  await sleep(ms)
+  fs.writeFileSync(testfile, 'abc')
+
+  await sleep(ms)
+  fs.appendFileSync(testfile, 'abc', { flags: 'a+' })
+
+  await sleep(ms)
+  fs.unlinkSync(testfile)
+})
+
+test('teardown', function (t) {
+  folder.close()
+  t.ok(Object.entries(folder.watchers).every(w => !(w instanceof EventEmitter)), 'no more watchers')
+
+  fs.rmdirSync(testdir)
+  fs.rmdirSync(appdir)
+
+  t.end()
+})
+
+function sleep (t) {
+  return new Promise((resolve) => {
+    var timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      resolve()
+    }, t)
+  })
+}

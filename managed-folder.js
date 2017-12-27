@@ -1,9 +1,9 @@
-var fs = require('fs')
 var assert = require('assert')
 var nanobus = require('nanobus')
 var path = require('path')
 var mkdirp = require('mkdirp')
-const IGNORED = ['.DS_Store']
+var chokidar = require('chokidar')
+const IGNORED = '.DS_Store'
 
 module.exports = ManagedFolder
 
@@ -28,40 +28,35 @@ ManagedFolder.prototype.createSubfolders = function () {
 
   // Create subfolders inside the specified 'appdir'
   // Create a watcher for each subfolder
-  Object.entries(this.subfolders).forEach(([folderKey, folderName]) => {
+  Object.entries(this.subfolders).forEach(([namespace, folderName]) => {
     var dirname = path.join(this.appdir, folderName)
-    var opts = { recursive: true }
+    var opts = {
+      ignored: IGNORED
+    }
 
     mkdirp.sync(dirname)
 
-    this.watchers[folderKey] = fs.watch(dirname, opts, (eventType, filename) => {
-      this.handleFolderEvent(eventType, folderKey, filename)
+    var watcher = chokidar.watch(dirname, opts)
+
+    this.watchers[namespace] = watcher
+    this.watchers[namespace].on('all', (eventName, filepath) => {
+      this.handleFolderEvent(eventName, namespace, filepath)
     })
   })
 }
 
-ManagedFolder.prototype.handleFolderEvent = function (eventType, namespace, filename) {
-  if (IGNORED.includes(filename)) return
-
-  var filepath = path.join(this.appdir, this.subfolders[namespace], filename)
-
-  switch (eventType) {
-    // emitted whenever a file appears or disappears in the folder
-    case 'rename':
-      fs.open(filepath, 'r', err => {
-        if (err) {
-          if (err.code === 'ENOENT') {
-            this.emit(`${namespace}:remove`, filepath)
-          } else {
-            this.emit(`${namespace}:add`, filepath)
-          }
-        }
-      })
+ManagedFolder.prototype.handleFolderEvent = function (eventName, namespace, filepath) {
+  switch (eventName) {
+    case 'add':
+      this.emit(`${namespace}:add`, filepath)
       break
 
-    // emitted whenever a file gets changed
     case 'change':
       this.emit(`${namespace}:change`, filepath)
+      break
+
+    case 'unlink':
+      this.emit(`${namespace}:remove`, filepath)
       break
 
     default:

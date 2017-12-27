@@ -1,10 +1,10 @@
 # managed-folder
 
-class that creates subfolders inside a given folder and 
-emits a namespaced event when a change happens inside any of them.
+Create subfolders inside a given folder and emit a namespaced event 
+when a change happens inside any of them.
 
-currently handles 3 types of events: `add`, `remove`, `change`.
-can be passed a map of namespace to folder name as an option. 
+Currently handles 3 types of events: `add`, `remove`, `change`.
+Can be passed a map of namespace to folder name as an option. 
 
 ```js
 // default subfolder map (namespace -> folder name)
