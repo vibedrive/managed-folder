@@ -1,4 +1,4 @@
-var musicfolder = require('./music-folder')
+var folder = require('./managed-folder')
 
 if (require.main === module) {
   var fs = require('fs')
@@ -14,7 +14,7 @@ if (require.main === module) {
 
   Object.assign(opts, argv)
 
-  musicfolder(opts)
+  folder(opts)
 } else {
-  module.exports = musicfolder
+  module.exports = folder
 }
