@@ -1,6 +1,6 @@
 {
   "name": "managed-folder",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "emit events with namespaces when files inside a manage folder change",
   "main": "index.js",
   "scripts": {

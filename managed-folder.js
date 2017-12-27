@@ -26,26 +26,24 @@ ManagedFolder.prototype = Object.create(nanobus.prototype)
 ManagedFolder.prototype.createSubfolders = function () {
   mkdirp.sync(this.appdir)
 
-  // Create subfolders inside the specified 'appdir'
-  // Create a watcher for each subfolder
   Object.entries(this.subfolders).forEach(([namespace, folderName]) => {
     var dirname = path.join(this.appdir, folderName)
-    var opts = {
-      ignored: IGNORED
-    }
-
     mkdirp.sync(dirname)
-
-    var watcher = chokidar.watch(dirname, opts)
-
-    this.watchers[namespace] = watcher
-    this.watchers[namespace].on('all', (eventName, filepath) => {
-      this.handleFolderEvent(eventName, namespace, filepath)
-    })
   })
+
+  var opts = {
+    ignored: IGNORED
+  }
+
+  this.watcher = chokidar.watch(this.appdir, opts)
+  this.watcher.on('ready', () => this.emit('ready'))
+  this.watcher.on('all', this.handleFolderEvent.bind(this))
 }
 
-ManagedFolder.prototype.handleFolderEvent = function (eventName, namespace, filepath) {
+ManagedFolder.prototype.handleFolderEvent = function (eventName, filepath) {
+  var namespace = this.getNamespace(filepath)
+  if (!namespace) return
+
   switch (eventName) {
     case 'add':
       this.emit(`${namespace}:add`, filepath)
@@ -64,8 +62,15 @@ ManagedFolder.prototype.handleFolderEvent = function (eventName, namespace, file
   }
 }
 
-ManagedFolder.prototype.close = function () {
-  Object.entries(this.watchers).forEach(([_, watcher]) => {
-    if (watcher) watcher.close()
+ManagedFolder.prototype.getNamespace = function (filepath) {
+  var dirname = path.dirname(filepath)
+  var tuple = Object.entries(this.subfolders).find(([namespace, folderName]) => {
+    return dirname === path.join(this.appdir, folderName)
   })
+
+  return tuple && tuple.length ? tuple[0] : null
+}
+
+ManagedFolder.prototype.close = function () {
+  this.watcher.close()
 }
