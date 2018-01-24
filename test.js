@@ -58,6 +58,15 @@ test('should emit events', function (t) {
   })
 })
 
+test('should return full subfolder path', function (t) {
+  t.plan(1)
+
+  var expected = testdir
+  var actual = folder.subfolder('inbox')
+
+  t.equal(actual, expected)
+})
+
 test('teardown', function (t) {
   folder.close()
   t.ok(Object.entries(folder.watchers).every(w => !(w instanceof EventEmitter)), 'no more watchers')

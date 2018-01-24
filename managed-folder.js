@@ -15,7 +15,7 @@ function ManagedFolder (opts = {}) {
   nanobus.call(this)
 
   this.appdir = opts.appdir
-  this.subfolders = opts.subfolders || { inbox: 'Inbox' }
+  this._subfolders = opts.subfolders || { inbox: 'Inbox' }
   this.watchers = {}
 
   this.createSubfolders()
@@ -23,10 +23,15 @@ function ManagedFolder (opts = {}) {
 
 ManagedFolder.prototype = Object.create(nanobus.prototype)
 
+ManagedFolder.prototype.subfolder = function (key) {
+  var dir = this._subfolders[key]
+  return path.join(this.appdir, dir)
+}
+
 ManagedFolder.prototype.createSubfolders = function () {
   mkdirp.sync(this.appdir)
 
-  Object.entries(this.subfolders).forEach(([namespace, folderName]) => {
+  Object.entries(this._subfolders).forEach(([namespace, folderName]) => {
     var dirname = path.join(this.appdir, folderName)
     mkdirp.sync(dirname)
   })
@@ -36,7 +41,9 @@ ManagedFolder.prototype.createSubfolders = function () {
   }
 
   this.watcher = chokidar.watch(this.appdir, opts)
-  this.watcher.on('ready', () => this.emit('ready'))
+  this.watcher.on('ready', () => {
+    this.emit('ready')
+  })
   this.watcher.on('all', this.handleFolderEvent.bind(this))
 }
 
@@ -64,7 +71,7 @@ ManagedFolder.prototype.handleFolderEvent = function (eventName, filepath) {
 
 ManagedFolder.prototype.getNamespace = function (filepath) {
   var dirname = path.dirname(filepath)
-  var tuple = Object.entries(this.subfolders).find(([namespace, folderName]) => {
+  var tuple = Object.entries(this._subfolders).find(([namespace, folderName]) => {
     return dirname === path.join(this.appdir, folderName)
   })
 

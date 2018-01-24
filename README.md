@@ -24,10 +24,26 @@ var opts = {
 
 var folder = Folder(opts)
 
-folder.on('inbox:add', function (filepath) {
-  console.log('file added to inbox folder:', filepath)
+folder.on('ready', function () {
+  folder.on('inbox:add' function (filepath) {
+    console.log('file added to inbox folder:', filepath)
+  })
 })
+
 ```
+
+### api
+
+`folder.on(eventName, callback)`
+register an event handler.
+events are named after the subfolder's key followed by `add`, `remove` or `change`
+ie: `mySubfolder:add`
+
+`folder.subfolder(key)`
+return the full path to a given subfolder key
+
+
+---
 
 if used from the command line you can pass opts either 
 
