@@ -23,6 +23,8 @@ function ManagedFolder (opts = {}) {
 
 ManagedFolder.prototype = Object.create(nanobus.prototype)
 
+ManagedFolder.prototype.constructor = ManagedFolder
+
 ManagedFolder.prototype.subfolder = function (key) {
   var dir = this._subfolders[key]
   return path.join(this.appdir, dir)
